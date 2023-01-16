@@ -13,8 +13,6 @@ public class ProductEntity implements Serializable {
     private static final long serialVersionUID = -7870664933635954570L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String productId;
     @Column(unique = true)
     private String title;

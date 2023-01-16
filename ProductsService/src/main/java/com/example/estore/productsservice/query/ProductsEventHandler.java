@@ -4,12 +4,14 @@ import com.example.estore.productsservice.core.data.ProductEntity;
 import com.example.estore.productsservice.core.data.ProductsRepository;
 import com.example.estore.productsservice.core.events.ProductCreatedEvent;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@ProcessingGroup("product-group")
 public class ProductsEventHandler {
     private final ProductsRepository productsRepository;
 
