@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -14,7 +15,7 @@ public class ProductsCommandController {
     private final CommandGateway commandGateway;
 
     @PostMapping
-    public String createProduct(@RequestBody CreateProductRestModel createProductRestModel) {
+    public String createProduct(@Valid @RequestBody CreateProductRestModel createProductRestModel) {
         CreateProductCommand createProductCommand = CreateProductCommand.builder().price(createProductRestModel.getPrice())
                 .quantity(createProductRestModel.getQuantity())
                 .title(createProductRestModel.getTitle())
