@@ -1,0 +1,3 @@
+FROM postgres
+ENV POSTGRES_PASSWORD user
+ENV POSTGRES_DB products
