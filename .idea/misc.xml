@@ -6,6 +6,8 @@
         <option value="$PROJECT_DIR$/DiscoveryServer/pom.xml" />
         <option value="$PROJECT_DIR$/ProductsService/pom.xml" />
         <option value="$PROJECT_DIR$/ApiGateway/pom.xml" />
+        <option value="$PROJECT_DIR$/ProductsService/src/main/java/com/example/estore/productsservice/OrdersService/pom.xml" />
+        <option value="$PROJECT_DIR$/OrdersService/pom.xml" />
       </list>
     </option>
   </component>
