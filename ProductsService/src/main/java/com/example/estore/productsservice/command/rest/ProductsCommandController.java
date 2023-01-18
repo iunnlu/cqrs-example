@@ -21,12 +21,7 @@ public class ProductsCommandController {
                 .title(createProductRestModel.getTitle())
                 .productId(UUID.randomUUID().toString()).build();
 
-        String returnValue;
-        try {
-            returnValue = commandGateway.sendAndWait(createProductCommand);
-        } catch (Exception e) {
-            returnValue = e.getLocalizedMessage();
-        }
+        String returnValue = commandGateway.sendAndWait(createProductCommand);
 
         return returnValue;
     }
