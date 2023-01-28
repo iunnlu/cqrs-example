@@ -9,6 +9,8 @@
     <file url="file://$PROJECT_DIR$/ProductsService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ProductsService/src/main/java/com/example/estore/productsservice/OrdersService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ProductsService/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/core/src/main/resources" charset="UTF-8" />
     <file url="file://D:/Dev/maven-repo/org/springframework/boot/spring-boot-starter-parent/2.5.5/src/main/resources" charset="UTF-8" />
   </component>
 </project>

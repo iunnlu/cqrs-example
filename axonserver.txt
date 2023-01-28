@@ -1,0 +1,1 @@
+nerdctl run --name axonserver -p 8024:8024 -p 8124:8124 -v "C:\Users\TCIUNLU\Desktop\Spring\projects\cqrs\docker-data\data":/data -v "C:\Users\TCIUNLU\Desktop\Spring\projects\cqrs\docker-data\eventdata":/eventdata -v "C:\Users\TCIUNLU\Desktop\Spring\projects\cqrs\docker-data\config":/config axoniq/axonserver

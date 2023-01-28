@@ -15,6 +15,8 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="ApiGateway" target="11" />
+      <module name="core" target="17" />
+      <module name="Core" target="17" />
       <module name="DiscoveryServer" target="11" />
       <module name="OrdersService" target="11" />
       <module name="ProductsService" target="11" />
@@ -23,6 +25,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ApiGateway" options="-parameters" />
+      <module name="Core" options="-parameters" />
       <module name="DiscoveryServer" options="-parameters" />
       <module name="OrdersService" options="-parameters" />
       <module name="ProductsService" options="-parameters" />
