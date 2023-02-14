@@ -1,9 +1,13 @@
 package com.example.estore.ordersservice.core.events;
 
 import com.example.estore.ordersservice.core.enums.OrderStatus;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderCreatedEvent {
     private String orderId;
     private String productId;
