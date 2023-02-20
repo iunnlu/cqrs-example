@@ -2,25 +2,27 @@ package com.example.estore.ordersservice.saga;
 
 import com.example.estore.core.commands.ReserveProductCommand;
 import com.example.estore.core.events.ProductReservedEvent;
+import com.example.estore.core.model.User;
+import com.example.estore.core.query.FetchUserPaymentDetailsQuery;
 import com.example.estore.ordersservice.core.events.OrderCreatedEvent;
-import lombok.RequiredArgsConstructor;
-import org.axonframework.commandhandling.CommandCallback;
-import org.axonframework.commandhandling.CommandMessage;
-import org.axonframework.commandhandling.CommandResultMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.StartSaga;
+import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.spring.stereotype.Saga;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Nonnull;
-
 @Saga
 public class OrderSaga {
     @Autowired
     private transient CommandGateway commandGateway;
+    
+    @Autowired
+    private transient QueryGateway queryGateway;
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderSaga.class);
 
     @StartSaga
@@ -46,5 +48,16 @@ public class OrderSaga {
     public void handle(ProductReservedEvent productReservedEvent) {
         //Process user payment
         LOGGER.info("ProductReservedEvent is called for productId: " + productReservedEvent.getProductId() + " and orderId: " + productReservedEvent.getOrderId());
+        FetchUserPaymentDetailsQuery fetchUserPaymentDetailsQuery = new FetchUserPaymentDetailsQuery(productReservedEvent.getUserId());
+        User user = null;
+        try {
+            user = queryGateway.query(fetchUserPaymentDetailsQuery, ResponseTypes.instanceOf(User.class)).join();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
+        if(user == null)
+            return;
+        LOGGER.info("Successfully fetched user payment details for user " + user.getFirstName());
     }
 }

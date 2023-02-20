@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/ProductsService/src/main/java/com/example/estore/productsservice/OrdersService/pom.xml" />
         <option value="$PROJECT_DIR$/OrdersService/pom.xml" />
         <option value="$PROJECT_DIR$/core/pom.xml" />
+        <option value="$PROJECT_DIR$/UsersService/pom.xml" />
       </list>
     </option>
   </component>
