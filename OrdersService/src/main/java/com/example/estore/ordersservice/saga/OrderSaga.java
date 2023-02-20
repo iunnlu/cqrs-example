@@ -1,5 +1,6 @@
 package com.example.estore.ordersservice.saga;
 
+import com.example.estore.core.commands.ProcessPaymentCommand;
 import com.example.estore.core.commands.ReserveProductCommand;
 import com.example.estore.core.events.ProductReservedEvent;
 import com.example.estore.core.model.User;
@@ -14,6 +15,9 @@ import org.axonframework.spring.stereotype.Saga;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Saga
 public class OrderSaga {
@@ -54,10 +58,27 @@ public class OrderSaga {
             user = queryGateway.query(fetchUserPaymentDetailsQuery, ResponseTypes.instanceOf(User.class)).join();
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
-            return;
         }
         if(user == null)
             return;
         LOGGER.info("Successfully fetched user payment details for user " + user.getFirstName());
+
+        ProcessPaymentCommand processPaymentCommand = ProcessPaymentCommand.builder()
+                .orderId(productReservedEvent.getOrderId())
+                .paymentDetails(user.getPaymentDetails())
+                .paymentId(UUID.randomUUID().toString())
+                .build();
+
+        String result = null;
+        try {
+            result = commandGateway.sendAndWait(processPaymentCommand, 10, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+        }
+
+        if(result == null) {
+            //Start comp transaction
+            LOGGER.info("Start compensating transaction");
+        }
     }
 }
