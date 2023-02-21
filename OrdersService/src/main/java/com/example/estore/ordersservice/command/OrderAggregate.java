@@ -1,6 +1,7 @@
 package com.example.estore.ordersservice.command;
 
 import com.example.estore.ordersservice.core.enums.OrderStatus;
+import com.example.estore.ordersservice.core.events.OrderApprovedEvent;
 import com.example.estore.ordersservice.core.events.OrderCreatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -29,6 +30,12 @@ public class OrderAggregate {
         AggregateLifecycle.apply(orderCreatedEvent);
     }
 
+    @CommandHandler
+    public void handle(ApproveOrderCommand approveOrderCommand) {
+        OrderApprovedEvent orderApprovedEvent = new OrderApprovedEvent(approveOrderCommand.getOrderId());
+        AggregateLifecycle.apply(orderApprovedEvent);
+    }
+
     @EventSourcingHandler
     public void on(OrderCreatedEvent orderCreatedEvent) {
         this.orderId = orderCreatedEvent.getOrderId();
@@ -37,5 +44,10 @@ public class OrderAggregate {
         this.quantity = orderCreatedEvent.getQuantity();
         this.addressId = orderCreatedEvent.getAddressId();
         this.orderStatus = orderCreatedEvent.getOrderStatus();
+    }
+
+    @EventSourcingHandler
+    public void on(OrderApprovedEvent orderApprovedEvent) {
+        this.orderStatus = orderApprovedEvent.getOrderStatus();
     }
 }

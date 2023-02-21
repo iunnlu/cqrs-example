@@ -2,13 +2,18 @@ package com.example.estore.ordersservice.saga;
 
 import com.example.estore.core.commands.ProcessPaymentCommand;
 import com.example.estore.core.commands.ReserveProductCommand;
+import com.example.estore.core.events.PaymentProcessedEvent;
 import com.example.estore.core.events.ProductReservedEvent;
 import com.example.estore.core.model.User;
 import com.example.estore.core.query.FetchUserPaymentDetailsQuery;
+import com.example.estore.ordersservice.command.ApproveOrderCommand;
+import com.example.estore.ordersservice.core.events.OrderApprovedEvent;
 import com.example.estore.ordersservice.core.events.OrderCreatedEvent;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
+import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
+import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.spring.stereotype.Saga;
@@ -80,5 +85,16 @@ public class OrderSaga {
             //Start comp transaction
             LOGGER.info("Start compensating transaction");
         }
+    }
+
+    @SagaEventHandler(associationProperty = "orderId")
+    public void handle(PaymentProcessedEvent paymentProcessedEvent) {
+        ApproveOrderCommand approveOrderCommand = new ApproveOrderCommand(paymentProcessedEvent.getOrderId());
+        commandGateway.send(approveOrderCommand);
+    }
+    @EndSaga
+    @SagaEventHandler(associationProperty = "orderId")
+    public void handle(OrderApprovedEvent orderApprovedEvent) {
+        LOGGER.info("Order is approved. Completed for orderId: " + orderApprovedEvent.getOrderId());
     }
 }
