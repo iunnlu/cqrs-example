@@ -4,6 +4,7 @@ import com.example.estore.ordersservice.core.data.OrderEntity;
 import com.example.estore.ordersservice.core.data.OrderRepository;
 import com.example.estore.ordersservice.core.events.OrderApprovedEvent;
 import com.example.estore.ordersservice.core.events.OrderCreatedEvent;
+import com.example.estore.ordersservice.core.events.OrderRejectedEvent;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -26,6 +27,15 @@ public class OrderEventHandler {
 
     @EventHandler
     public void on(OrderApprovedEvent event) throws Exception {
+        OrderEntity order = orderRepository.findById(event.getOrderId()).orElse(null);
+        if(order != null) {
+            order.setOrderStatus(event.getOrderStatus());
+            orderRepository.save(order);
+        }
+    }
+
+    @EventHandler
+    public void on(OrderRejectedEvent event) throws Exception {
         OrderEntity order = orderRepository.findById(event.getOrderId()).orElse(null);
         if(order != null) {
             order.setOrderStatus(event.getOrderStatus());

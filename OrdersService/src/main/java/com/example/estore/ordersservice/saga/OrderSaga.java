@@ -1,14 +1,18 @@
 package com.example.estore.ordersservice.saga;
 
+import com.example.estore.core.commands.CancelProductReservationCommand;
 import com.example.estore.core.commands.ProcessPaymentCommand;
 import com.example.estore.core.commands.ReserveProductCommand;
 import com.example.estore.core.events.PaymentProcessedEvent;
+import com.example.estore.core.events.ProductReservationCancelEvent;
 import com.example.estore.core.events.ProductReservedEvent;
 import com.example.estore.core.model.User;
 import com.example.estore.core.query.FetchUserPaymentDetailsQuery;
 import com.example.estore.ordersservice.command.ApproveOrderCommand;
+import com.example.estore.ordersservice.command.RejectOrderCommand;
 import com.example.estore.ordersservice.core.events.OrderApprovedEvent;
 import com.example.estore.ordersservice.core.events.OrderCreatedEvent;
+import com.example.estore.ordersservice.core.events.OrderRejectedEvent;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.modelling.saga.EndSaga;
@@ -63,9 +67,14 @@ public class OrderSaga {
             user = queryGateway.query(fetchUserPaymentDetailsQuery, ResponseTypes.instanceOf(User.class)).join();
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
-        }
-        if(user == null)
+
+            cancelProductReservation(productReservedEvent, e.getMessage());
             return;
+        }
+        if(user == null) {
+            cancelProductReservation(productReservedEvent, "Could not fetch user payment details.");
+            return;
+        }
         LOGGER.info("Successfully fetched user payment details for user " + user.getFirstName());
 
         ProcessPaymentCommand processPaymentCommand = ProcessPaymentCommand.builder()
@@ -79,12 +88,36 @@ public class OrderSaga {
             result = commandGateway.sendAndWait(processPaymentCommand, 10, TimeUnit.SECONDS);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
+            cancelProductReservation(productReservedEvent, ex.getMessage());
+            return;
         }
 
         if(result == null) {
             //Start comp transaction
             LOGGER.info("Start compensating transaction");
+            cancelProductReservation(productReservedEvent, "Could not process user payment with provided payment details");
         }
+    }
+
+    @SagaEventHandler(associationProperty = "orderId")
+    public void handle(ProductReservationCancelEvent productReservationCancelEvent) {
+        RejectOrderCommand rejectOrderCommand =
+                new RejectOrderCommand(productReservationCancelEvent.getOrderId(), productReservationCancelEvent.getReason());
+
+        commandGateway.send(rejectOrderCommand);
+    }
+
+    private void cancelProductReservation(ProductReservedEvent productReservedEvent, String reason) {
+        CancelProductReservationCommand cancelProductReservationCommand =
+                CancelProductReservationCommand.builder()
+                        .orderId(productReservedEvent.getOrderId())
+                        .productId(productReservedEvent.getProductId())
+                        .quantity(productReservedEvent.getQuantity())
+                        .userId(productReservedEvent.getUserId())
+                        .reason(reason)
+                        .build();
+
+        commandGateway.send(cancelProductReservationCommand);
     }
 
     @SagaEventHandler(associationProperty = "orderId")
@@ -96,5 +129,11 @@ public class OrderSaga {
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(OrderApprovedEvent orderApprovedEvent) {
         LOGGER.info("Order is approved. Completed for orderId: " + orderApprovedEvent.getOrderId());
+    }
+
+    @EndSaga
+    @SagaEventHandler(associationProperty = "orderId")
+    public void handle(OrderRejectedEvent orderRejectedEvent) {
+        LOGGER.info("Order is rejected. Completed for orderId: " + orderRejectedEvent.getOrderId() + ", reason: " + orderRejectedEvent.getReason());
     }
 }

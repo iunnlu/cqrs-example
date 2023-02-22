@@ -1,5 +1,6 @@
 package com.example.estore.productsservice.query;
 
+import com.example.estore.core.events.ProductReservationCancelEvent;
 import com.example.estore.core.events.ProductReservedEvent;
 import com.example.estore.productsservice.core.data.ProductEntity;
 import com.example.estore.productsservice.core.data.ProductsRepository;
@@ -39,5 +40,14 @@ public class ProductsEventHandler {
         productsRepository.save(productEntity);
 
         LOGGER.info("ProductReservedEvent is called for productId: " + productReservedEvent.getProductId() + " and orderId: " + productReservedEvent.getOrderId());
+    }
+
+    @EventHandler
+    public void on(ProductReservationCancelEvent productReservationCancelEvent) {
+        ProductEntity productEntity = productsRepository.findByProductId(productReservationCancelEvent.getProductId());
+        productEntity.setQuantity(productEntity.getQuantity() + productReservationCancelEvent.getQuantity());
+        productsRepository.save(productEntity);
+
+        LOGGER.info("ProductReservedEvent is called for productId: " + productReservationCancelEvent.getProductId() + " and orderId: " + productReservationCancelEvent.getOrderId());
     }
 }
